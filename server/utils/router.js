@@ -83,7 +83,6 @@ router.delete("/trainer/:trainerName", async (req, res, next) => {
 router.post("/trainer/:trainerName/pokemon", async (req, res, next) => {
   try {
     const { trainerName } = req.params;
-    console.log(trainerName)
     // リクエストボディにポケモン名が含まれていなければ400を返す
     if (!req.body.name) {
       return res.status(400).send("Pokemon name is required");
@@ -92,6 +91,7 @@ router.post("/trainer/:trainerName/pokemon", async (req, res, next) => {
     const trainer_info = await findTrainer(trainerName);
     const pokemon_info = {
       name: pokemon.name,
+      nickname: pokemon.name,
       // type: pokemon.types.map(type => type.type.name),
       // height: pokemon.height,
       // weight: pokemon.weight,
@@ -99,7 +99,6 @@ router.post("/trainer/:trainerName/pokemon", async (req, res, next) => {
       image: pokemon.sprites.front_default
     }
     trainer_info.pokemons.push(pokemon_info)
-    console.log(pokemon)
     // TODO: 削除系 API エンドポイントを利用しないかぎりポケモンは保持する
     const result = await upsertTrainer(trainerName, trainer_info);
     res.status(result["$metadata"].httpStatusCode).send(result);
@@ -108,7 +107,40 @@ router.post("/trainer/:trainerName/pokemon", async (req, res, next) => {
   }
 });
 
-/** ポケモンの削除 */
-// TODO: ポケモンを削除する API エンドポイントの実装
+/** ポケモンのニックネームを更新 */
+router.put("/trainer/:trainerName/pokemon/:pokemonName", async (req, res, next) => {
+  try {
+    const { trainerName, pokemonName } = req.params;
+    const trainer = await findTrainer(trainerName);
+    const pokemon = trainer.pokemons.find(pokemon => pokemon.name === pokemonName);
+    if (!pokemon) {
+      return res.status(404).send("Pokemon not found");
+    }
+    pokemon.nickname = req.body.nickname;
+    const result = await upsertTrainer(trainerName, trainer);
+    res.status(result["$metadata"].httpStatusCode).send(result);
+  } catch (err) {
+    next(err);
+  }
+});
 
+/** ポケモンの削除 */
+router.delete("/trainer/:trainerName/pokemon/:pokemonName", async (req, res, next) => {
+  try {
+    const { trainerName, pokemonName } = req.params;
+    const trainer = await findTrainer(trainerName);
+    if (!trainer) {
+      return res.status(404).send("Trainer not found");
+    }
+    const pokemonIndex = trainer.pokemons.findIndex(pokemon => pokemon.name === pokemonName);
+    if (pokemonIndex === -1) {
+      return res.status(404).send("Pokemon not found");
+    }
+    trainer.pokemons.splice(pokemonIndex, 1);
+    const result = await upsertTrainer(trainerName, trainer);
+    res.status(result["$metadata"].httpStatusCode).send(result);
+  } catch (err) {
+    next(err);
+  }
+});
 export default router;

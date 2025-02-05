@@ -5,7 +5,6 @@ const name = ref('');
 
 const handleSubmit = async () => {
   const trainerName = { name: name.value }; // トレーナー名をオブジェクトに変換
-  console.log(trainerName);
 
   try {
     const response = await fetch('/api/trainer', {

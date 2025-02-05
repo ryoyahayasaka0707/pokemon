@@ -10,13 +10,10 @@ const { data: pokemons } = await useFetch('https://pokeapi.co/api/v2/pokemon', {
   server: false,
 })
 
-console.log(pokemons.value) // データ取得確認
-
 const caughtPokemon = ref('') // 捕まえたポケモンの名前を保持する変数
 
 const catchPokemon = async (pokemonName) => {
   caughtPokemon.value = pokemonName
-  console.log(`${pokemonName} を捕まえた！`) // 発火する処理
   try {
     const response = await fetch(`/api/trainer/${trainer}/pokemon`, {
       method: 'POST', // POST リクエスト
@@ -27,7 +24,6 @@ const catchPokemon = async (pokemonName) => {
     });
 
     const result = await response.json();
-    console.log("Success:", result);
     return result;
   } catch (error) {
     console.error('Failed to catch Pokémon:', error);
