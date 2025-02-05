@@ -30,16 +30,14 @@ getTrainer(trainer.value)  // ページ表示時にデータ取得
 // トレーナー削除
 const deleteEachTrainer = async (trainer) => {
   try {
-    const response = await fetch(`/api/trainer/${trainer.value}`, {
+    await fetch(`/api/trainer/${trainer}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(), // JSON に変換して送信
     });
-
-    const result = await response.json();
-    return result;
+    return null;
   } catch (error) {
     console.error("Error:", error)
     return null

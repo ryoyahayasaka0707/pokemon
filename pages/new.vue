@@ -7,23 +7,13 @@ const handleSubmit = async () => {
   const trainerName = { name: name.value }; // トレーナー名をオブジェクトに変換
 
   try {
-    const response = await fetch('/api/trainer', {
+    await fetch('/api/trainer', {
       method: 'POST', // POST リクエスト
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(trainerName), // JSON に変換して送信
     });
-
-    if (response.ok) {
-      alert('トレーナー名が保存されました！');
-    } else if (response.status === 400) {
-      alert('トレーナー名が無効です。');
-    } else if (response.status === 409) {
-      alert('トレーナー名がすでに存在しています。');
-    } else {
-      alert('トレーナー名の保存に失敗しました。');
-    }
   } catch (error) {
     console.error('Error saving trainer name:', error);
     alert('トレーナー名の保存中にエラーが発生しました。');
